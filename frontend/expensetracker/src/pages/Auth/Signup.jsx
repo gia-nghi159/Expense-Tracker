@@ -30,7 +30,7 @@ const Signup = () => {
     }
     if(!password){
       setError("Please enter a password");
-      return;
+      return; 
     }
 
     setError("");
