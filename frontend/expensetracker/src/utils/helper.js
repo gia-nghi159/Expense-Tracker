@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -26,9 +28,45 @@ export const addThousandsSeparator = (num) => {
 };
 
 export const prepareExpenseBarChartData = (data = []) => {
-    const chartData = data.map((item) => ({
-        category: item?.category,
+    // sort from oldest to newest
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    const chartData = [];
+    sortedData.forEach((item) => {
+        const dateStr = moment(item?.date).format("Do MMM");
+        const existing = chartData.find(d => d.month === dateStr);
+        if (existing) {
+            existing.amount += item.amount;
+        } else {
+            chartData.push({ month: dateStr, amount: item.amount, category: item.category });
+        }
+    });
+    return chartData;
+};
+
+export const prepareIncomeBarChartData = (data = []) => {
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const chartData = [];
+    sortedData.forEach((item) => {
+        const dateStr = moment(item?.date).format("Do MMM");
+        const existing = chartData.find(d => d.month === dateStr);
+        if (existing) {
+            existing.amount += item.amount;
+        } else {
+            chartData.push({ month: dateStr, amount: item.amount, source: item.source });
+        }
+    });
+    return chartData;
+};
+
+export const prepareExpenseLineChartData = (data = []) => {
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const chartData = sortedData.map((item) => ({
+        month: moment(item?.date).format("Do MMM"),
         amount: item?.amount,
+        category: item?.category,
     }));
     return chartData;
-}
+};

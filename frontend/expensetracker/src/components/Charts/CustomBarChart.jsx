@@ -6,11 +6,12 @@ const CustomBarChart = ({ data }) => {
 
     // Function to determine bar color based on index
     const getBarColor = (index) => {
-        return index % 2 === 0 ? '#875cf5' : '#cfbefb'; // Alternate between two colors
+        return index % 2 === 0 ? '#5B7E3C' : '#C44545'; // Alternate between two colors
     };
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
+            const label = payload[0].payload.category || payload[0].payload.source || "Total";
             return (
                 <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">
                     <p className="text-xs font-semibold text-green-800 mb-1">{payload[0].payload.category}</p>

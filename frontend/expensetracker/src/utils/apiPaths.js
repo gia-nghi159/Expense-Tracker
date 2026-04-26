@@ -10,15 +10,15 @@ export const API_PATHS = {
         GET_DATA: '/api/v1/dashboard',
     },
     INCOME: {
-        ADD_INCOME: '/api/v1/income/add',
-        GET_ALL_INCOME: '/api/v1/income/get',
-        DELETE_INCOME: (incomeId) => `/api/v1/income/delete/${incomeId}`,
+        ADD_INCOME: '/api/v1/income',
+        GET_ALL_INCOME: '/api/v1/income',
+        DELETE_INCOME: (incomeId) => `/api/v1/income/${incomeId}`,
         DOWNLOAD_INCOME: '/api/v1/income/downloadexcel', 
     },
     EXPENSE: {
-        ADD_EXPENSE: '/api/v1/expense/add',
-        GET_ALL_EXPENSE: '/api/v1/expense/get',
-        DELETE_EXPENSE: (expenseId) => `/api/v1/expense/delete/${expenseId}`,
+        ADD_EXPENSE: '/api/v1/expense',
+        GET_ALL_EXPENSE: '/api/v1/expense',
+        DELETE_EXPENSE: (expenseId) => `/api/v1/expense/${expenseId}`,
         DOWNLOAD_EXPENSE: '/api/v1/expense/downloadexcel', 
     },
     IMAGE: {

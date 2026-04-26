@@ -60,37 +60,37 @@ const Home = () => {
             icon={<IoMdCard />}
             label="Total Balance"
             value={addThousandsSeparator(dashboardData?.totalBalance || 0)}
-            color="bg-purple-500"
+            color="bg-[#F7DB91]"
           />
           <InfoCard
             icon={<LuWalletMinimal />}
             label="Total Income"
             value={addThousandsSeparator(dashboardData?.totalIncome || 0)}
-            color="bg-orange-500"
+            color="bg-[#84B179]"
           />
           <InfoCard
             icon={<LuHandCoins />}
             label="Total Expense"
-            value={addThousandsSeparator(dashboardData?.totalExpense || 0)}
-            color="bg-red-500"
+            value={addThousandsSeparator(dashboardData?.totalExpenses || 0)}
+            color="bg-[#D97A2B]"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <RecentTransactions
             transactions={dashboardData?.recentTransactions}
-            onSeeMore={() => navigate("/expense")}
+            onSeeMore={() => navigate("/expenses")}
           />
 
           <FinanceOverview
             totalBalance={dashboardData?.totalBalance || 0}
             totalIncome={dashboardData?.totalIncome || 0}
-            totalExpense={dashboardData?.totalExpense || 0}
+            totalExpenses={dashboardData?.totalExpenses || 0}
           />
 
           <ExpenseTransactions
             transactions={dashboardData?.last30DaysExpenses?.transactions || []}
-            onSeemore = {() => navigate("/expense")}
+            onSeeMore = {() => navigate("/expenses")}
           />
 
           <Last30DaysExpenses
@@ -99,7 +99,7 @@ const Home = () => {
 
           <RecentIncomeWithChart
             data={dashboardData?.last60DaysIncome?.transactions?.slice(0,4) || []}
-            toatalIncome={dashboardData?.totalIncome || 0}
+            totalIncome={dashboardData?.totalIncome || 0}
           />
 
           <RecentIncome
