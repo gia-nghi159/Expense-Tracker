@@ -1,8 +1,8 @@
-# Expense Tracker
+# 💰 Expense Tracker
 
 A full-stack MERN (MongoDB, Express.js, React, Node.js) application designed to help users track their personal finances. Users can easily monitor their income and expenses, view visual representations of their spending habits, and download their financial data.
 
-## Features
+## ✨ Features
 
 * **User Authentication:** Secure registration and login using JWT (JSON Web Tokens) and bcrypt password hashing.
 * **Comprehensive Dashboard:** An interactive overview of total balance, total income, and total expenses.
@@ -14,9 +14,9 @@ A full-stack MERN (MongoDB, Express.js, React, Node.js) application designed to 
 * **Excel Export:** Download expense and income transaction histories as `.xlsx` files.
 * **Customization:** Assign emojis to specific transactions using an integrated emoji picker.
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-**Frontend**
+** 💻 Frontend**
 * React.js
 * React Router DOM (Routing)
 * Tailwind CSS (Styling)
@@ -26,7 +26,7 @@ A full-stack MERN (MongoDB, Express.js, React, Node.js) application designed to 
 * Moment.js (Date formatting)
 * React Hot Toast (Notifications)
 
-**Backend**
+** ⚙️ Backend**
 * Node.js & Express.js
 * MongoDB & Mongoose
 * JSON Web Token (JWT) (Authentication)
@@ -34,13 +34,13 @@ A full-stack MERN (MongoDB, Express.js, React, Node.js) application designed to 
 * Multer (File uploading)
 * XLSX (Excel file generation)
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 * Node.js installed on your local machine
 * A running MongoDB instance (local or MongoDB Atlas)
 
-### Installation
+### 🔧 Installation
 
 1.  **Clone the repository** (or download the source code).
 
@@ -80,29 +80,29 @@ A full-stack MERN (MongoDB, Express.js, React, Node.js) application designed to 
       npm start
       ```
 
-## API Reference
+## 🔌 API Reference
 
-### Authentication (`/api/v1/auth`)
+### 🔐 Authentication (`/api/v1/auth`)
 * `POST /register` - Register a new user
 * `POST /login` - Authenticate a user and return a token
 * `GET /getUser` - Get current authenticated user details
 
-### Dashboard (`/api/v1/dashboard`)
+### 🏠 Dashboard (`/api/v1/dashboard`)
 * `GET /` - Retrieve aggregated dashboard data (totals, recent transactions, 30/60-day breakdowns)
 
-### Income (`/api/v1/income`)
+### 📈 Income (`/api/v1/income`)
 * `POST /add` - Add a new income record
 * `GET /get` - Retrieve all income records for the user
 * `DELETE /:id` - Delete a specific income record
 * `GET /download` - Generate and download an Excel file of income records
 
-### Expense (`/api/v1/expense`)
+### 📉 Expense (`/api/v1/expense`)
 * `POST /add` - Add a new expense record
 * `GET /get` - Retrieve all expense records for the user
 * `DELETE /:id` - Delete a specific expense record
 * `GET /download` - Generate and download an Excel file of expense records
 
-## Folder Structure
+## 📂 Folder Structure
 
 A high-level overview of the project's architecture:
 
