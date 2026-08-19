@@ -1,52 +1,34 @@
-import React from 'react'
-
+import React from 'react';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate
-} from'react-router-dom';
-
-import Login from './pages/Auth/Login';
-import Signup from './pages/Auth/Signup';
-import Home from './pages/Dashboard/Home';
-import Income from './pages/Dashboard/Income';
-import Expense from './pages/Dashboard/Expense';
-import UserProvider from './context/userContext';
+} from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import GraphDashboard from './components/GraphDashboard';
 
 const App = () => {
   return (
-    <UserProvider>
-      <div>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Root />} />
-            <Route path="/login" exact element={<Login />} />
-            <Route path="/signup" exact element={<Signup />} />
-            <Route path="/dashboard" exact element={<Home />} />
-            <Route path="/income" exact element={<Income />} />
-            <Route path="/expenses" exact element={<Expense />} />
-          </Routes>
-        </Router>
-      </div>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<GraphDashboard />} />
+          <Route path="/dashboard" element={<GraphDashboard />} />
+          <Route path="/trip/:tripId" element={<GraphDashboard />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
 
       <Toaster
+        position="top-right"
         toastOptions={{
-          className:"",
-          style: {fontSize: "13px"},
+          className: "!bg-slate-900 !text-white !border !border-slate-800",
+          style: { fontSize: "13px" },
         }}
       />
-    </UserProvider>
-  )
-}
+    </div>
+  );
+};
 
-export default App
-
-const Root = () => {
-  // check if token exists in local storage
-  const isAuthenticated = !!localStorage.getItem('token');
-
-  // redirect to dashboard if authenticated, otherwise to login
-  return isAuthenticated ? <Navigate to='/dashboard' /> : <Navigate to='/login' />;
-}
+export default App;

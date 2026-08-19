@@ -1,10 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-display: "Poppins", sans-serif;
-  --breakpoint-3xl: 1920px;
-  --color-primary: #228B22;
+  --font-display: "Outfit", "Plus Jakarta Sans", sans-serif;
 }
 
 @layer base {
@@ -12,32 +10,36 @@
     font-family: var(--font-display);
   }
   body {
-    background-color: #fcfbfc;
+    background-color: #f1f7f4;
+    color: #1e293b;
     overflow-x: hidden;
-    
+    background-image: url('/bg-matcha-strawberry.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 }
 
-.input-box {
-  @apply w-full flex justify-between gap-3 text-sm text-black bg-slate-100 rounded px-4 py-3 mb-4 mt-3 border border-slate-200 outline-none;
+/* Luminous Pastel Frosted Glassmorphism */
+.glass-light {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(20, 40, 30, 0.06), 0 4px 12px -2px rgba(20, 40, 30, 0.04);
 }
 
-.btn-primary {
-  @apply w-full text-sm font-medium text-white bg-green-700 shadow-lg shadow-green-600/5 p-[10px] rounded-md my-1 hover:bg-green-700/80 hover:text-white;
+.glass-matcha-card {
+  background: rgba(240, 253, 244, 0.85);
+  backdrop-filter: blur(18px);
+  border: 1.5px solid rgba(74, 222, 128, 0.5);
+  box-shadow: 0 8px 25px -4px rgba(34, 197, 94, 0.1);
 }
 
-.card {
-  @apply bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50;
-}
-
-.card-btn {
-  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-green-500 hover:bg-green-50 px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer;
-}
-
-.add-btn {
-  @apply flex items-center gap-1.5 text-xs md:text-sm font-medium text-green-600 whitespace-nowrap bg-green-50 border border-green-100 rounded-lg px-4 py-2 cursor-pointer;
-}
-
-.add-btn-fill {
-  @apply text-white bg-primary
+.glass-strawberry-card {
+  background: rgba(255, 241, 242, 0.85);
+  backdrop-filter: blur(18px);
+  border: 1.5px solid rgba(251, 113, 133, 0.5);
+  box-shadow: 0 8px 25px -4px rgba(244, 63, 94, 0.1);
 }

@@ -1,27 +1,33 @@
-export const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export const API_PATHS = {
-    AUTH: {
-        LOGIN: '/api/v1/auth/login',
-        REGISTER: '/api/v1/auth/register',
-        GET_USER_INFO: '/api/v1/auth/getUser', 
+    USERS: {
+        LIST: '/api/v1/users',
+        CREATE: '/api/v1/users',
+        GET: (id) => `/api/v1/users/${id}`,
     },
-    DASHBOARD: {
-        GET_DATA: '/api/v1/dashboard',
+    GROUPS: {
+        LIST: '/api/v1/groups',
+        CREATE: '/api/v1/groups',
+        QUICK_CREATE: '/api/v1/groups/quick-create',
+        GET: (id) => `/api/v1/groups/${id}`,
+        DELETE: (id) => `/api/v1/groups/${id}`,
+        ADD_MEMBER: (id) => `/api/v1/groups/${id}/members`,
+        REMOVE_MEMBER: (groupId, userId) => `/api/v1/groups/${groupId}/members/${userId}`,
     },
-    INCOME: {
-        ADD_INCOME: '/api/v1/income',
-        GET_ALL_INCOME: '/api/v1/income',
-        DELETE_INCOME: (incomeId) => `/api/v1/income/${incomeId}`,
-        DOWNLOAD_INCOME: '/api/v1/income/downloadexcel', 
+    EXPENSES: {
+        INGEST: '/api/v1/expenses/ingest',
+        LIST_GROUP: (groupId) => `/api/v1/expenses/group/${groupId}`,
+        DELETE: (expenseId) => `/api/v1/expenses/${expenseId}`,
+        EDIT: (expenseId) => `/api/v1/expenses/${expenseId}`,
     },
-    EXPENSE: {
-        ADD_EXPENSE: '/api/v1/expense',
-        GET_ALL_EXPENSE: '/api/v1/expense',
-        DELETE_EXPENSE: (expenseId) => `/api/v1/expense/${expenseId}`,
-        DOWNLOAD_EXPENSE: '/api/v1/expense/downloadexcel', 
+    GRAPH: {
+        NETWORK: (groupId) => `/api/v1/graph/network/${groupId}`,
+        SIMPLIFY: (groupId) => `/api/v1/graph/simplify/${groupId}`,
     },
-    IMAGE: {
-        UPLOAD_IMAGE: '/api/v1/auth/upload-image',
-    }
-}
+    SETTLEMENTS: {
+        RECORD: '/api/v1/settlements/record',
+    },
+    SEED: '/api/v1/seed',
+    HEALTH: '/health',
+};
