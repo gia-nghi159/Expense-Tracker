@@ -76,7 +76,7 @@ uv run uvicorn app.main:app --reload --port 8000
 Open a third terminal window to start the React UI:
 ```bash
 # Navigate to the frontend directory
-cd frontend/expensetracker
+cd frontend
 
 # Install JavaScript dependencies
 npm install
