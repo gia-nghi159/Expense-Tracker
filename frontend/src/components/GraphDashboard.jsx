@@ -136,8 +136,12 @@ const GraphDashboard = () => {
         spread: 60,
         origin: { y: 0.6 },
       });
-    } catch {
-      toast.error('Failed to seed demo data.');
+    } catch (err) {
+      if (err.response?.data?.detail) {
+        toast.error(err.response.data.detail, { duration: 5000 });
+      } else {
+        toast.error('Failed to seed demo data.');
+      }
     } finally {
       setIsSeeding(false);
     }

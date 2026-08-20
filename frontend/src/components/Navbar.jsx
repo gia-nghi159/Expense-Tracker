@@ -90,11 +90,17 @@ const Navbar = ({
             </button>
           )}
 
+          <div className="flex items-center gap-1.5 bg-white/50 px-2 py-1 rounded-xl border border-slate-200/50 mr-1 hidden lg:flex">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+              Max 5 Trips
+            </span>
+          </div>
+
           <button
             onClick={onSeedDemo}
             disabled={isSeeding}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 hover:bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl text-xs font-bold transition shadow-sm"
-            title="Populates 5 users, 5 expenses, and multi-party debt web"
+            title="Populates dummy data. Note: Public demo is capped at 5 active trips."
           >
             <Sprout className="w-3.5 h-3.5 text-emerald-600" />
             <span>{isSeeding ? 'Seeding...' : 'Seed'}</span>
