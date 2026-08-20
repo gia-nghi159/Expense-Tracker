@@ -613,8 +613,8 @@ class GraphService:
         from datetime import datetime, timezone, timedelta
         
         # 0. Auto-Cleanup: Delete demo trips older than 24 hours to prevent DB bloat
-        cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
-        old_groups = [g.id for g in self._groups.values() if getattr(g, 'created_at', "") < cutoff and g.name.startswith("Random Trip")]
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+        old_groups = [g.id for g in self._groups.values() if g.created_at and g.created_at < cutoff and g.name.startswith("Random Trip")]
         for gid in old_groups:
             self.delete_group(gid)
             
