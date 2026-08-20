@@ -234,10 +234,9 @@ const GraphDashboard = () => {
                 </div>
                 {networkData?.budget ? (
                   <div className="w-full bg-slate-200 rounded-full h-2.5">
-                    <div 
-                      className={`h-2.5 rounded-full ${
-                        (networkData.total_group_spending / networkData.budget) > 0.9 ? 'bg-red-400' : 'bg-amber-500'
-                      }`}
+                    <div
+                      className={`h-2.5 rounded-full ${(networkData.total_group_spending / networkData.budget) > 0.9 ? 'bg-red-400' : 'bg-amber-500'
+                        }`}
                       style={{ width: `${Math.min((networkData.total_group_spending / networkData.budget) * 100, 100)}%` }}
                     ></div>
                   </div>
@@ -287,7 +286,7 @@ const GraphDashboard = () => {
                     <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs max-w-sm shadow-sm transition-all duration-500 ease-out">
                       <p className="font-black text-sm mb-1">⏳ Waking up the cloud server</p>
                       <p className="font-medium text-amber-700/90 leading-relaxed">
-                        Because this portfolio is hosted on a free tier, the backend server goes to sleep when inactive. It usually takes about <strong>45–50 seconds</strong> to spin up. Please hang tight!
+                        Because this project is hosted on a free tier, the backend server goes to sleep when inactive. It usually takes about <strong>45–50 seconds</strong> to spin up. Please hang tight!
                       </p>
                     </div>
                   )}
@@ -329,13 +328,12 @@ const GraphDashboard = () => {
                           <span className="text-xs font-bold text-slate-900 truncate">{node.name}</span>
                         </div>
                         <span
-                          className={`text-xs font-black px-2.5 py-1 rounded-full ${
-                            isPos
-                              ? 'text-emerald-800 bg-emerald-100 border border-emerald-300'
-                              : isNeg
-                                ? 'text-rose-800 bg-rose-100 border border-rose-300'
-                                : 'text-slate-600 bg-slate-100'
-                          }`}
+                          className={`text-xs font-black px-2.5 py-1 rounded-full ${isPos
+                            ? 'text-emerald-800 bg-emerald-100 border border-emerald-300'
+                            : isNeg
+                              ? 'text-rose-800 bg-rose-100 border border-rose-300'
+                              : 'text-slate-600 bg-slate-100'
+                            }`}
                         >
                           {isPos && '+'}
                           ${node.net_balance.toFixed(2)}
@@ -359,7 +357,7 @@ const GraphDashboard = () => {
                   {(!networkData?.category_breakdown || Object.keys(networkData.category_breakdown).length === 0) ? (
                     <p className="text-xs font-bold text-slate-500 py-4 text-center">No expenses logged yet 👥</p>
                   ) : (
-                    Object.entries(networkData.category_breakdown).sort((a,b) => b[1] - a[1]).map(([cat, amount], idx) => {
+                    Object.entries(networkData.category_breakdown).sort((a, b) => b[1] - a[1]).map(([cat, amount], idx) => {
                       const percentage = networkData.total_group_spending > 0 ? (amount / networkData.total_group_spending) * 100 : 0;
                       return (
                         <div key={idx} className="space-y-1">
