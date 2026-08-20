@@ -6,6 +6,11 @@ Have you ever gone on a group trip with friends, and by the end of the week, eve
 
 ---
 
+## ✨ Interactive Demo & Seeding
+If you are just exploring the application and don't have any real data yet, look for the **"🌱 Seed"** button in the top navigation bar! Clicking this will instantly populate your database with a complex web of users, trips, and shared expenses so you can immediately test the graph visualization and debt simplification algorithm.
+
+---
+
 ## 🎯 Scope & Impact Metrics 
 
 **Key Backend Engineering Achievements:**
