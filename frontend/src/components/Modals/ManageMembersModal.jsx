@@ -25,7 +25,8 @@ const ManageMembersModal = ({ isOpen, onClose, group, onMembersUpdated, networkD
       toast.success("Trip deleted successfully.");
       onClose();
       if (onMembersUpdated) onMembersUpdated(true); // pass true to indicate trip deleted
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       toast.error("Failed to delete trip.");
     } finally {
       setIsSubmitting(false);

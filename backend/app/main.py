@@ -1,7 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.api import expenses, graph, groups, seed, settlements, users
 from app.config import settings
 from app.database import db
@@ -29,15 +28,6 @@ app = FastAPI(
     description="High-performance Graph Backend for multi-party financial modeling, cycle elimination, and debt minimization.",
     version="1.0.0",
     lifespan=lifespan
-)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 # Mount API Routers under /api/v1

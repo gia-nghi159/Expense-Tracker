@@ -20,9 +20,6 @@ class Settings(BaseSettings):
     def neo4j_auth_user(self) -> str:
         return self.NEO4J_USER if self.NEO4J_USER != "neo4j" else (self.NEO4J_USERNAME or "neo4j")
     
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000", "*"]
-    
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

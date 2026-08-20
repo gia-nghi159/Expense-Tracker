@@ -10,10 +10,7 @@ const Navbar = ({
   onOpenCreateTrip,
   onOpenManageMembers,
   onOpenAddExpense,
-  onOpenSimplify,
-  isNeo4jConnected = false,
   isSeeding = false,
-  isSimplifying = false,
 }) => {
   const handleCopyShareLink = () => {
     if (!selectedGroupId) return;

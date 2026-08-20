@@ -33,7 +33,8 @@ const SimplifyModal = ({ isOpen, onClose, simplifyData, groupId, onSettled }) =>
       });
 
       if (onSettled) onSettled();
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       toast.error('Failed to record settlement.');
     } finally {
       setSettlingIndex(null);
