@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://fingraph.onrender.com/api/:path*"
+      "destination": "https://fingraph-mogm.onrender.com/api/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://fingraph.onrender.com/health"
+      "destination": "https://fingraph-mogm.onrender.com/health"
     },
     {
       "source": "/(.*)",
