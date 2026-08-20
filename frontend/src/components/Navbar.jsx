@@ -90,11 +90,7 @@ const Navbar = ({
             </button>
           )}
 
-          <div className="flex items-center gap-1.5 bg-white/50 px-2 py-1 rounded-xl border border-slate-200/50 mr-1 hidden lg:flex">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-              Max 5 Trips
-            </span>
-          </div>
+
 
           <button
             onClick={onSeedDemo}
