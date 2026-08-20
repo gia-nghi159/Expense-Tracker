@@ -610,6 +610,14 @@ class GraphService:
 
     def seed_demo_data(self) -> Dict:
         import random
+        from datetime import datetime, timezone, timedelta
+        
+        # 0. Auto-Cleanup: Delete demo trips older than 24 hours to prevent DB bloat
+        cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+        old_groups = [g.id for g in self._groups.values() if getattr(g, 'created_at', "") < cutoff and g.name.startswith("Random Trip")]
+        for gid in old_groups:
+            self.delete_group(gid)
+            
         # 1. Create Users
         names = ["Alice Vance", "Bob Martinez", "Charlie Chen", "Dave Wilson", "Emma Watson", "Fiona Gallagher", "George King", "Hannah Abbott"]
         selected_names = random.sample(names, random.randint(4, 7))
