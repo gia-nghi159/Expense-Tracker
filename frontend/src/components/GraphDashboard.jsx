@@ -35,6 +35,7 @@ const GraphDashboard = () => {
   const [isNeo4jConnected, setIsNeo4jConnected] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [showSlowLoadWarning, setShowSlowLoadWarning] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isSimplifying, setIsSimplifying] = useState(false);
 
@@ -54,10 +55,20 @@ const GraphDashboard = () => {
     }
   }, []);
 
-  // Selected Group ID
   const [selectedGroupId, setSelectedGroupId] = useState(() => {
     return tripId || localStorage.getItem('fingraph_active_trip') || null;
   });
+
+  // Slow Load Warning Timer
+  useEffect(() => {
+    let timer;
+    if (isLoading) {
+      timer = setTimeout(() => setShowSlowLoadWarning(true), 5000);
+    } else {
+      setShowSlowLoadWarning(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   const handleSelectGroup = (groupId) => {
     setSelectedGroupId(groupId);
@@ -267,8 +278,19 @@ const GraphDashboard = () => {
               </div>
 
               {isLoading ? (
-                <div className="h-[590px] rounded-3xl border border-white/80 bg-white/60 backdrop-blur-xl flex items-center justify-center text-slate-700 font-bold text-sm shadow-xl">
-                  Loading graph topology... 💰
+                <div className="h-[590px] rounded-3xl border border-white/80 bg-white/60 backdrop-blur-xl flex flex-col items-center justify-center text-slate-700 font-bold text-sm shadow-xl p-8 text-center">
+                  <div className="flex items-center gap-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-emerald-600 border-t-transparent"></div>
+                    <span>Loading graph topology... 💰</span>
+                  </div>
+                  {showSlowLoadWarning && (
+                    <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs max-w-sm shadow-sm transition-all duration-500 ease-out">
+                      <p className="font-black text-sm mb-1">⏳ Waking up the cloud server</p>
+                      <p className="font-medium text-amber-700/90 leading-relaxed">
+                        Because this portfolio is hosted on a free tier, the backend server goes to sleep when inactive. It usually takes about <strong>45–50 seconds</strong> to spin up. Please hang tight!
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <NetworkGraph
