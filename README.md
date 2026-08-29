@@ -6,11 +6,6 @@ Have you ever gone on a group trip with friends, and by the end of the week, eve
 
 ---
 
-## ✨ Interactive Demo & Seeding
-If you are just exploring the application and don't have any real data yet, look for the **"🌱 Seed"** button in the top navigation bar! Clicking this will instantly populate your database with a complex web of users, trips, and shared expenses so you can immediately test the graph visualization and debt simplification algorithm.
-
----
-
 ## 🎯 Scope & Impact Metrics 
 
 **Key Backend Engineering Achievements:**
@@ -23,7 +18,7 @@ If you are just exploring the application and don't have any real data yet, look
 
 ---
 
-## 🛠️ Deep Tech Stack Detail
+## 🛠️ Tech Stack Detail
 
 ### Backend
 * **Python & FastAPI:** The core backend framework, chosen for its asynchronous capabilities, extremely fast routing, and automatic OpenAPI documentation generation.
@@ -35,7 +30,7 @@ If you are just exploring the application and don't have any real data yet, look
 * **React & Vite:** Provides a blazing-fast, component-driven user interface.
 
 * **React Flow (`@xyflow/react`):** Powers the core visual experience by rendering the complex debt graph network into dynamic, draggable nodes and animated edges.
-* **Tailwind CSS v4:** Used for the modern styling system.
+* **Tailwind CSS:** Used for the modern styling system.
 * **Axios:** Centralized HTTP client configured with interceptors for robust API communication.
 
 ### Database
@@ -90,17 +85,6 @@ npm install
 npm run dev
 ```
 *The application will now be available in your browser at `http://localhost:5173`.*
-
----
-
-## 🔮 Future Plans & Scope Expansion
-While the core debt settlement engine is fully functional, the project architecture was designed with the following future expansions in mind:
-
-1. **Multi-Currency Support & Live FX Rates:** 
-   Integrate 3rd-party forex APIs (e.g., ExchangeRate-API) to allow users to input expenses in various foreign currencies while traveling, and automatically calculate the simplified settlement in a single base currency (like USD).
-
-2. **Push Notifications & Webhooks:** 
-   Build an asynchronous worker queue (using Celery/Redis) to send automated email or push notification reminders to users who have unsettled balances older than 30 days.
 
 ---
 
