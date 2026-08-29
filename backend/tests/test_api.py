@@ -12,32 +12,6 @@ def test_health_check():
     assert data["status"] == "healthy"
 
 
-def test_seed_and_graph_network():
-    # 1. Seed demo data
-    seed_res = client.post("/api/v1/seed")
-    assert seed_res.status_code == 200
-    seed_data = seed_res.json()
-    group_id = seed_data["group_id"]
-    assert seed_data["users_count"] >= 4
-    assert seed_data["expenses_count"] > 0
-
-    # 2. Fetch Network Graph
-    net_res = client.get(f"/api/v1/graph/network/{group_id}")
-    assert net_res.status_code == 200
-    net_data = net_res.json()
-    assert len(net_data["nodes"]) >= 4
-    assert len(net_data["edges"]) > 0
-    assert net_data["total_group_spending"] > 0
-    assert net_data["total_unsettled_debt"] > 0
-
-    # 3. Simplify Debts
-    simplify_res = client.post(f"/api/v1/graph/simplify/{group_id}")
-    assert simplify_res.status_code == 200
-    sim_data = simplify_res.json()
-    assert sim_data["simplified_settlement_count"] < sim_data["original_edge_count"]
-    assert sim_data["reduction_percentage"] > 0
-
-
 def test_idempotent_expense_creation():
     # 1. Create 2 users
     u1 = client.post("/api/v1/users", json={"name": "User Alpha", "email": "alpha@test.com"}).json()

@@ -14,50 +14,117 @@ import {
   Edit3,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
 import Navbar from './Navbar';
 import NetworkGraph from './NetworkGraph';
 import AddExpenseModal from './Modals/AddExpenseModal';
-import SimplifyModal from './Modals/SimplifyModal';
-import CreateTripModal from './Modals/CreateTripModal';
+
 import ManageMembersModal from './Modals/ManageMembersModal';
+import PersonaModal from './Modals/PersonaModal';
+import MemberDetailDrawer from './Modals/MemberDetailDrawer';
 
 const GraphDashboard = () => {
   const { tripId } = useParams();
   const navigate = useNavigate();
 
-  const [groups, setGroups] = useState([]);
   const [networkData, setNetworkData] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [simplifyData, setSimplifyData] = useState(null);
-  const [isNeo4jConnected, setIsNeo4jConnected] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
   const [showSlowLoadWarning, setShowSlowLoadWarning] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
-  const [isSimplifying, setIsSimplifying] = useState(false);
 
-  const [isCreateTripOpen, setIsCreateTripOpen] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-  const [isSimplifyOpen, setIsSimplifyOpen] = useState(false);
   const [isManageMembersOpen, setIsManageMembersOpen] = useState(false);
+  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
+  const [selectedMemberNode, setSelectedMemberNode] = useState(null);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
 
-  // Health check
-  const checkHealth = useCallback(async () => {
+  const [activePersona, setActivePersona] = useState(null);
+
+  // GC: Clean up trips older than 90 days from localStorage
+  const cleanOldTrips = () => {
     try {
-      const res = await axiosInstance.get(API_PATHS.HEALTH);
-      setIsNeo4jConnected(!!res.data?.neo4j_connected);
-    } catch {
-      setIsNeo4jConnected(false);
+      const tripsStr = localStorage.getItem('fingraph_trips');
+      if (tripsStr) {
+        const trips = JSON.parse(tripsStr);
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        
+        const freshTrips = trips.filter(t => new Date(t.lastVisited) > ninetyDaysAgo);
+        if (freshTrips.length !== trips.length) {
+          localStorage.setItem('fingraph_trips', JSON.stringify(freshTrips));
+        }
+      }
+    } catch (e) {
+      console.error(e);
     }
+  };
+
+  // Fetch network data and manage persona
+  const fetchNetwork = useCallback(async (groupId) => {
+    if (!groupId) {
+      navigate('/');
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const [netRes, expRes, simRes] = await Promise.all([
+        axiosInstance.get(API_PATHS.GRAPH.NETWORK(groupId)),
+        axiosInstance.get(API_PATHS.EXPENSES.LIST_GROUP(groupId)),
+        axiosInstance.post(API_PATHS.GRAPH.SIMPLIFY(groupId)).catch(() => ({ data: null })),
+      ]);
+      setNetworkData(netRes.data);
+      setExpenses(expRes.data);
+      if (simRes.data) setSimplifyData(simRes.data);
+
+      // Save to localStorage wallet and update lastVisited
+      try {
+        const trips = JSON.parse(localStorage.getItem('fingraph_trips') || '[]');
+        const existing = trips.find(t => t.id === groupId);
+        if (existing) {
+          existing.lastVisited = new Date().toISOString();
+          existing.name = netRes.data.group_name;
+        } else {
+          trips.push({ id: groupId, name: netRes.data.group_name, lastVisited: new Date().toISOString() });
+        }
+        localStorage.setItem('fingraph_trips', JSON.stringify(trips));
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Check Persona
+      try {
+        const personas = JSON.parse(localStorage.getItem('fingraph_personas') || '{}');
+        if (personas[groupId]) {
+          setActivePersona(personas[groupId]);
+        } else {
+          setIsPersonaModalOpen(true);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+    } catch (err) {
+      console.error('Failed to load network graph:', err);
+      toast.error('Trip not found or inaccessible.');
+      navigate('/');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    cleanOldTrips();
   }, []);
 
-  const [selectedGroupId, setSelectedGroupId] = useState(() => {
-    return tripId || localStorage.getItem('fingraph_active_trip') || null;
-  });
+  useEffect(() => {
+    if (tripId) {
+      fetchNetwork(tripId);
+    } else {
+      navigate('/');
+    }
+  }, [tripId, fetchNetwork, navigate]);
 
   // Slow Load Warning Timer
   useEffect(() => {
@@ -70,136 +137,61 @@ const GraphDashboard = () => {
     return () => clearTimeout(timer);
   }, [isLoading]);
 
-  const handleSelectGroup = (groupId) => {
-    setSelectedGroupId(groupId);
-    if (groupId) {
-      localStorage.setItem('fingraph_active_trip', groupId);
-      navigate(`/trip/${groupId}`, { replace: true });
-    }
-  };
 
-  // Fetch groups
-  const fetchGroups = useCallback(async () => {
-    try {
-      const res = await axiosInstance.get(API_PATHS.GROUPS.LIST);
-      setGroups(res.data);
-      if (res.data.length > 0) {
-        const savedId = tripId || localStorage.getItem('fingraph_active_trip');
-        const exists = res.data.some((g) => g.id === savedId);
-        if (savedId && exists) {
-          setSelectedGroupId(savedId);
-        } else {
-          setSelectedGroupId(res.data[0].id);
-          localStorage.setItem('fingraph_active_trip', res.data[0].id);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load groups:', err);
-    }
-  }, [tripId]);
 
-  // Fetch network data
-  const fetchNetwork = useCallback(async (groupId) => {
-    if (!groupId) return;
-    try {
-      setIsLoading(true);
-      const [netRes, expRes, simRes] = await Promise.all([
-        axiosInstance.get(API_PATHS.GRAPH.NETWORK(groupId)),
-        axiosInstance.get(API_PATHS.EXPENSES.LIST_GROUP(groupId)),
-        axiosInstance.post(API_PATHS.GRAPH.SIMPLIFY(groupId)).catch(() => ({ data: null })),
-      ]);
-      setNetworkData(netRes.data);
-      setExpenses(expRes.data);
-      if (simRes.data) {
-        setSimplifyData(simRes.data);
-      }
-    } catch (err) {
-      console.error('Failed to load network graph:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkHealth();
-    fetchGroups();
-  }, [checkHealth, fetchGroups]);
-
-  useEffect(() => {
-    if (selectedGroupId) {
-      fetchNetwork(selectedGroupId);
-    }
-  }, [selectedGroupId, fetchNetwork]);
-
-  // Seed demo
-  const handleSeedDemo = async () => {
-    try {
-      setIsSeeding(true);
-      const res = await axiosInstance.post(API_PATHS.SEED);
-      toast.success('🌱 Dummy data seeded!');
-      await fetchGroups();
-      if (res.data.group_id) {
-        handleSelectGroup(res.data.group_id);
-        await fetchNetwork(res.data.group_id);
-      }
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-      });
-    } catch (err) {
-      if (err.response?.data?.detail) {
-        toast.error(err.response.data.detail, { duration: 5000 });
-      } else {
-        toast.error('Failed to seed demo data.');
-      }
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
-  const handleRunSimplification = async () => {
-    if (!selectedGroupId) return;
-    try {
-      setIsSimplifying(true);
-      const res = await axiosInstance.post(API_PATHS.GRAPH.SIMPLIFY(selectedGroupId));
-      setSimplifyData(res.data);
-      setIsSimplifyOpen(true);
-    } catch {
-      toast.error('Failed to simplify debts.');
-    } finally {
-      setIsSimplifying(false);
-    }
-  };
 
   const handleDeleteExpense = async (expenseId) => {
     if (!window.confirm('Are you sure you want to delete this expense? This will recalculate the entire debt web!')) return;
     try {
       await axiosInstance.delete(API_PATHS.EXPENSES.DELETE(expenseId));
       toast.success('Expense deleted. Graph healed! ✨');
-      fetchNetwork(selectedGroupId);
+      fetchNetwork(tripId);
     } catch {
       toast.error('Failed to delete expense.');
     }
   };
 
-  const selectedGroup = groups.find((g) => g.id === selectedGroupId);
+  const handlePersonaSelect = (memberId) => {
+    try {
+      const personas = JSON.parse(localStorage.getItem('fingraph_personas') || '{}');
+      personas[tripId] = memberId;
+      localStorage.setItem('fingraph_personas', JSON.stringify(personas));
+      setActivePersona(memberId);
+      setIsPersonaModalOpen(false);
+      toast.success("Identity saved securely in your browser!");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleLeaveTrip = () => {
+    if (!window.confirm('Are you sure you want to leave?')) return;
+    try {
+      const trips = JSON.parse(localStorage.getItem('fingraph_trips') || '[]');
+      const newTrips = trips.filter(t => t.id !== tripId);
+      localStorage.setItem('fingraph_trips', JSON.stringify(newTrips));
+      
+      const personas = JSON.parse(localStorage.getItem('fingraph_personas') || '{}');
+      delete personas[tripId];
+      localStorage.setItem('fingraph_personas', JSON.stringify(personas));
+      
+      navigate('/');
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
-    <div className="min-h-screen text-slate-900 flex flex-col font-sans relative">
+    <div className="min-h-screen text-slate-900 flex flex-col font-sans relative bg-[url('/background.jpg')] bg-cover bg-center bg-fixed bg-no-repeat">
       <div className="relative z-10 flex flex-col min-h-screen">
-        <Navbar
-          groups={groups}
-          selectedGroupId={selectedGroupId}
-          onSelectGroup={handleSelectGroup}
-          onSeedDemo={handleSeedDemo}
-          onOpenCreateTrip={() => setIsCreateTripOpen(true)}
+        <Navbar 
+          groupName={networkData?.group_name} 
           onOpenManageMembers={() => setIsManageMembersOpen(true)}
-          onOpenAddExpense={() => setIsAddExpenseOpen(true)}
-          onOpenSimplify={handleRunSimplification}
-          isNeo4jConnected={isNeo4jConnected}
-          isSeeding={isSeeding}
-          isSimplifying={isSimplifying}
+          onOpenAddExpense={() => {
+            setExpenseToEdit(null);
+            setIsAddExpenseOpen(true);
+          }}
+          onLeaveTrip={handleLeaveTrip}
         />
 
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -247,12 +239,12 @@ const GraphDashboard = () => {
             </div>
 
             {/* Trip Crew */}
-            <div className="bg-white/80 border-2 border-emerald-300/80 rounded-3xl p-5 shadow-lg backdrop-blur-xl flex items-center gap-4 hover:shadow-xl hover:border-emerald-400 transition">
-              <div className="w-13 h-13 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shadow-sm text-2xl font-bold">
+            <div className="bg-white/80 border-2 border-blue-300/80 rounded-3xl p-5 shadow-lg backdrop-blur-xl flex items-center gap-4 hover:shadow-xl hover:border-blue-400 transition">
+              <div className="w-13 h-13 rounded-2xl bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-700 shadow-sm text-2xl font-bold">
                 👥
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-emerald-800">Trip Friends</p>
+                <p className="text-xs font-black uppercase tracking-wider text-blue-800">Trip Friends</p>
                 <p className="text-2xl font-black text-slate-900">
                   {networkData?.nodes?.length || 0} People
                 </p>
@@ -265,15 +257,6 @@ const GraphDashboard = () => {
             {/* Left 2 Cols: React Flow Interactive Graph */}
             <div className="lg:col-span-2 space-y-3">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-emerald-600" />
-                    <span>Live Debt Network Topology</span>
-                  </h2>
-                  <p className="text-xs font-medium text-slate-600">
-                    Drag nodes freely • Switch between raw web and clean net flow
-                  </p>
-                </div>
               </div>
 
               {isLoading ? (
@@ -296,6 +279,8 @@ const GraphDashboard = () => {
                   nodes={networkData?.nodes || []}
                   edges={networkData?.edges || []}
                   simplifiedSettlements={simplifyData?.settlements || []}
+                  activePersona={activePersona}
+                  onNodeClick={(e, node) => setSelectedMemberNode(networkData.nodes.find(n => n.id === node.id))}
                 />
               )}
             </div>
@@ -313,19 +298,27 @@ const GraphDashboard = () => {
                   {networkData?.nodes?.map((node) => {
                     const isPos = node.net_balance > 0.01;
                     const isNeg = node.net_balance < -0.01;
+                    const isMe = node.id === activePersona;
 
                     return (
                       <div
                         key={node.id}
-                        className="flex items-center justify-between p-2.5 rounded-2xl bg-white/90 border border-slate-200/80 shadow-sm hover:border-emerald-300 transition"
+                        className={`flex items-center justify-between p-2.5 rounded-2xl bg-white/90 border shadow-sm transition ${isMe ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200/80 hover:border-emerald-300'}`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <img
-                            src={node.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${node.name}`}
+                            src={node.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${node.name}`}
                             alt={node.name}
                             className="w-8 h-8 rounded-xl bg-slate-100 object-cover border border-slate-200"
                           />
-                          <span className="text-xs font-bold text-slate-900 truncate">{node.name}</span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-black text-slate-900 truncate flex items-center">
+                              {node.name} {isMe && <span className="text-[10px] font-bold text-white bg-emerald-500 px-1.5 py-0.5 rounded-md ml-1.5 uppercase shadow-sm">You</span>}
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mt-0.5">
+                              Total Spending: ${node.total_share?.toFixed(2) || '0.00'}
+                            </span>
+                          </div>
                         </div>
                         <span
                           className={`text-xs font-black px-2.5 py-1 rounded-full ${isPos
@@ -386,7 +379,7 @@ const GraphDashboard = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {expenses.map((exp) => {
-                  const payer = selectedGroup?.members?.find((m) => m.id === exp.paid_by_user_id)?.name || 'Someone';
+                  const payer = networkData?.nodes?.find((m) => m.id === exp.paid_by_user_id)?.name || 'Someone';
                   return (
                     <div key={exp.id} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition group">
                       <div className="flex justify-between items-start mb-2">
@@ -429,52 +422,44 @@ const GraphDashboard = () => {
         </main>
       </div>
 
-      {/* Modals */}
-      <CreateTripModal
-        isOpen={isCreateTripOpen}
-        onClose={() => setIsCreateTripOpen(false)}
-        onTripCreated={async (newGroupId) => {
-          await fetchGroups();
-          handleSelectGroup(newGroupId);
-          await fetchNetwork(newGroupId);
-        }}
-      />
-
       <AddExpenseModal
         isOpen={isAddExpenseOpen}
         onClose={() => {
           setIsAddExpenseOpen(false);
           setExpenseToEdit(null);
         }}
-        group={selectedGroup}
+        group={{ id: tripId, members: networkData?.nodes || [] }}
         initialExpense={expenseToEdit}
-        onExpenseAdded={() => fetchNetwork(selectedGroupId)}
-      />
-
-      <SimplifyModal
-        isOpen={isSimplifyOpen}
-        onClose={() => setIsSimplifyOpen(false)}
-        simplifyData={simplifyData}
-        groupId={selectedGroupId}
-        onSettled={() => fetchNetwork(selectedGroupId)}
+        onExpenseAdded={() => fetchNetwork(tripId)}
       />
 
       <ManageMembersModal
         isOpen={isManageMembersOpen}
         onClose={() => setIsManageMembersOpen(false)}
-        group={selectedGroup}
+        group={{ id: tripId, members: networkData?.nodes || [] }}
         networkData={networkData}
         onMembersUpdated={async (isTripDeleted) => {
           if (isTripDeleted) {
-            setSelectedGroupId(null);
-            setNetworkData(null);
-            setExpenses([]);
-            await fetchGroups();
+            handleLeaveTrip();
           } else {
-            await fetchGroups();
-            await fetchNetwork(selectedGroupId);
+            await fetchNetwork(tripId);
           }
         }}
+      />
+      
+      <PersonaModal
+        isOpen={isPersonaModalOpen}
+        nodes={networkData?.nodes || []}
+        onSelect={handlePersonaSelect}
+        onClose={() => setIsPersonaModalOpen(false)} // Allowed to close if they want to remain anonymous spectator
+      />
+
+      <MemberDetailDrawer
+        isOpen={!!selectedMemberNode}
+        onClose={() => setSelectedMemberNode(null)}
+        node={selectedMemberNode}
+        edges={networkData?.edges || []}
+        isMe={selectedMemberNode?.id === activePersona}
       />
     </div>
   );

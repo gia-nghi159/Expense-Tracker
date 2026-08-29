@@ -6,6 +6,7 @@ class UserBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=50)
     email: Optional[str] = None
     avatar_url: Optional[str] = None
+    payment_handles: Optional[Dict[str, str]] = None
 
 class UserCreate(UserBase):
     pass
@@ -18,6 +19,10 @@ class GroupBase(BaseModel):
     currency: str = Field(default="USD", max_length=3)
     budget: Optional[float] = Field(None, ge=0)
     description: Optional[str] = None
+
+class GroupUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
+    budget: Optional[float] = Field(None, ge=0)
 
 class GroupCreate(GroupBase):
     member_user_ids: List[str] = []
@@ -42,6 +47,7 @@ class ExpenseCreate(BaseModel):
     category: str = Field(default="Other", max_length=50)
     total_amount: float = Field(..., gt=0)
     paid_by_user_id: str
+    created_by_name: Optional[str] = None
     splits: List[ExpenseSplit] = Field(..., min_length=1)
 
 class ExpenseResponse(BaseModel):
@@ -52,6 +58,7 @@ class ExpenseResponse(BaseModel):
     total_amount: float
     paid_by_user_id: str
     paid_by_name: Optional[str] = None
+    created_by_name: Optional[str] = None
     created_at: datetime
     splits: List[ExpenseSplit]
 
@@ -69,6 +76,9 @@ class GraphNode(BaseModel):
     id: str
     name: str
     net_balance: float
+    total_paid: float = 0.0
+    total_share: float = 0.0
+    payment_handles: Optional[Dict[str, str]] = None
 
 class GraphEdge(BaseModel):
     from_user_id: str
@@ -103,3 +113,15 @@ class SimplifyDebtResponse(BaseModel):
     reduction_percentage: float
     settlements: List[SettlementProposal]
 
+class LedgerLegResponse(BaseModel):
+    user_id: str
+    amount_cents: int
+    direction: str
+
+class LedgerEntryResponse(BaseModel):
+    transaction_id: str
+    group_id: str
+    entry_type: str
+    timestamp: float
+    legs: List[LedgerLegResponse]
+    metadata: Optional[Dict] = None

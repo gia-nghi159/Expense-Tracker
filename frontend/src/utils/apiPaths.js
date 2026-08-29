@@ -11,6 +11,7 @@ export const API_PATHS = {
         CREATE: '/api/v1/groups',
         QUICK_CREATE: '/api/v1/groups/quick-create',
         GET: (id) => `/api/v1/groups/${id}`,
+        UPDATE: (id) => `/api/v1/groups/${id}`,
         DELETE: (id) => `/api/v1/groups/${id}`,
         ADD_MEMBER: (id) => `/api/v1/groups/${id}/members`,
         REMOVE_MEMBER: (groupId, userId) => `/api/v1/groups/${groupId}/members/${userId}`,

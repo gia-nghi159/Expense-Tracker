@@ -1,7 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.api import expenses, graph, groups, seed, settlements, users
+from app.api import expenses, graph, groups, settlements, users
 from app.config import settings
 from app.database import db
 
@@ -37,7 +37,6 @@ app.include_router(groups.router, prefix=API_PREFIX)
 app.include_router(expenses.router, prefix=API_PREFIX)
 app.include_router(graph.router, prefix=API_PREFIX)
 app.include_router(settlements.router, prefix=API_PREFIX)
-app.include_router(seed.router, prefix=API_PREFIX)
 
 
 @app.get("/health", tags=["Health"])

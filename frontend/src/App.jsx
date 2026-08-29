@@ -8,13 +8,16 @@ import {
 import { Toaster } from 'react-hot-toast';
 import GraphDashboard from './components/GraphDashboard';
 
+import LandingPage from './components/LandingPage';
+import CreateTrip from './components/CreateTrip';
+
 const App = () => {
   return (
     <div>
       <Router>
         <Routes>
-          <Route path="/" element={<GraphDashboard />} />
-          <Route path="/dashboard" element={<GraphDashboard />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/create" element={<CreateTrip />} />
           <Route path="/trip/:tripId" element={<GraphDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -8,6 +8,31 @@ const ManageMembersModal = ({ isOpen, onClose, group, onMembersUpdated, networkD
   const [newMemberName, setNewMemberName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessages, setErrorMessages] = useState({});
+  const [editName, setEditName] = useState(group?.name || '');
+  const [editBudget, setEditBudget] = useState(group?.budget || '');
+
+  React.useEffect(() => {
+    if (group) {
+      setEditName(group.name || '');
+      setEditBudget(group.budget || '');
+    }
+  }, [group]);
+
+  const handleUpdateSettings = async () => {
+    try {
+      setIsSubmitting(true);
+      await axiosInstance.patch(API_PATHS.GROUPS.UPDATE(group.id), {
+        name: editName.trim() || undefined,
+        budget: editBudget ? parseFloat(editBudget) : null
+      });
+      toast.success("Trip settings updated!");
+      if (onMembersUpdated) onMembersUpdated();
+    } catch {
+      toast.error("Failed to update trip settings.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
 
   const handleDeleteTrip = async () => {
@@ -106,6 +131,38 @@ const ManageMembersModal = ({ isOpen, onClose, group, onMembersUpdated, networkD
 
         {/* Body */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1">
+          {/* Edit Trip Settings */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-slate-700">
+              Trip Settings
+            </h4>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Trip Name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="flex-[2] bg-white border border-slate-200 rounded-2xl px-4 py-2 text-slate-900 text-sm font-medium focus:outline-none focus:border-teal-400"
+              />
+              <input
+                type="number"
+                placeholder="Budget ($)"
+                value={editBudget}
+                onChange={(e) => setEditBudget(e.target.value)}
+                className="flex-1 bg-white border border-slate-200 rounded-2xl px-4 py-2 text-slate-900 text-sm font-medium focus:outline-none focus:border-teal-400"
+              />
+              <button
+                onClick={handleUpdateSettings}
+                disabled={isSubmitting || (!editName.trim() && !editBudget)}
+                className="bg-teal-600 hover:bg-teal-700 text-white rounded-2xl px-4 text-sm font-bold transition disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+          
+          <div className="h-px bg-slate-100 w-full" />
+
           {/* Add Member Form */}
           <form onSubmit={handleAddMember} className="flex gap-2">
             <input
@@ -138,7 +195,7 @@ const ManageMembersModal = ({ isOpen, onClose, group, onMembersUpdated, networkD
                     <div className="flex items-center justify-between p-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
                       <div className="flex items-center gap-3">
                         <img
-                          src={m.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.name}`}
+                          src={m.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${m.name}`}
                           alt={m.name}
                           className="w-8 h-8 rounded-xl bg-slate-100 object-cover"
                         />

@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,11 +20,11 @@ class Settings(BaseSettings):
     def neo4j_auth_user(self) -> str:
         return self.NEO4J_USER if self.NEO4J_USER != "neo4j" else (self.NEO4J_USERNAME or "neo4j")
     
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore"
     )
-
 
 settings = Settings()

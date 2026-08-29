@@ -295,7 +295,7 @@ const AddExpenseModal = ({ isOpen, onClose, group, onExpenseAdded, initialExpens
                         {isSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
                       </div>
                       <img
-                        src={m.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.name}`}
+                        src={m.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${m.name}`}
                         alt={m.name}
                         className="w-6 h-6 rounded-full bg-slate-200"
                       />

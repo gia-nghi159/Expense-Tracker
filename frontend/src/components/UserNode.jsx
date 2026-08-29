@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
-const UserNode = ({ data, isConnectable }) => {
+const UserNode = ({ data }) => {
   const isPositive = data.net_balance > 0.01;
   const isNegative = data.net_balance < -0.01;
 
@@ -15,16 +15,14 @@ const UserNode = ({ data, isConnectable }) => {
             : 'bg-white/85 border-slate-300 shadow-slate-400/20'
       }`}
     >
-      {/* Handles on 4 sides */}
-      <Handle type="target" position={Position.Top} id="t" isConnectable={isConnectable} className="!w-2.5 !h-2.5 !bg-emerald-500 !border-2 !border-white" />
-      <Handle type="source" position={Position.Bottom} id="b" isConnectable={isConnectable} className="!w-2.5 !h-2.5 !bg-red-400 !border-2 !border-white" />
-      <Handle type="target" position={Position.Left} id="l" isConnectable={isConnectable} className="!w-2.5 !h-2.5 !bg-emerald-500 !border-2 !border-white" />
-      <Handle type="source" position={Position.Right} id="r" isConnectable={isConnectable} className="!w-2.5 !h-2.5 !bg-red-400 !border-2 !border-white" />
+      {/* Central Handle for Floating Edge */}
+      <Handle type="target" position={Position.Top} id="t" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 -z-10" />
+      <Handle type="source" position={Position.Bottom} id="s" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 -z-10" />
 
       <div className="flex items-center gap-3">
         <div className="relative">
           <img
-            src={data.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.name}`}
+            src={data.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${data.name}`}
             alt={data.name}
             className={`w-11 h-11 rounded-2xl border-2 object-cover p-0.5 bg-slate-50 ${
               isPositive ? 'border-emerald-400' : isNegative ? 'border-red-400' : 'border-slate-300'
@@ -33,7 +31,14 @@ const UserNode = ({ data, isConnectable }) => {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-extrabold text-slate-900 tracking-tight truncate">{data.name}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-extrabold text-slate-900 tracking-tight truncate">{data.name}</p>
+            {data.isMe && (
+              <span className="bg-emerald-500 text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md shadow-sm">
+                You
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span
               className={`text-xs font-black px-2.5 py-0.5 rounded-full inline-block ${

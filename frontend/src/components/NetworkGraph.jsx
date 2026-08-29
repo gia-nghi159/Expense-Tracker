@@ -11,15 +11,21 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Layers, Sparkles } from 'lucide-react';
 import UserNode from './UserNode';
+import FloatingEdge from './FloatingEdge';
 
 const nodeTypes = {
   userNode: UserNode,
+};
+
+const edgeTypes = {
+  floating: FloatingEdge,
 };
 
 const NetworkGraph = ({
   nodes = [],
   edges = [],
   simplifiedSettlements = [],
+  activePersona,
   onNodeClick,
 }) => {
   const [viewMode, setViewMode] = useState('RAW'); // 'RAW' or 'SIMPLIFIED'
@@ -48,10 +54,11 @@ const NetworkGraph = ({
           email: node.email,
           net_balance: node.net_balance,
           avatar_url: node.avatar_url,
+          isMe: node.id === activePersona,
         },
       };
     });
-  }, [nodes]);
+  }, [nodes, activePersona]);
 
   // Edges styling with high-contrast light pastel badges
   const activeEdgesData = useMemo(() => {
@@ -62,7 +69,7 @@ const NetworkGraph = ({
         target: s.to_user_id,
         label: `pays $${s.amount.toFixed(2)}`,
         animated: true,
-        type: 'straight',
+        type: 'floating',
         style: {
           stroke: '#059669',
           strokeWidth: 3.5,
@@ -96,7 +103,7 @@ const NetworkGraph = ({
       target: edge.to_user_id,
       label: `owes $${edge.amount.toFixed(2)}`,
       animated: true,
-      type: 'straight',
+      type: 'floating',
       style: {
         stroke: '#e11d48',
         strokeWidth: Math.min(4, Math.max(1.8, edge.amount / 35)),
@@ -135,16 +142,17 @@ const NetworkGraph = ({
   }, [activeEdgesData, setFlowEdges]);
 
   return (
-    <div className="w-full h-[590px] rounded-3xl overflow-hidden border border-white/80 bg-white/40 backdrop-blur-md shadow-xl relative">
+    <div className="w-full h-[590px] rounded-3xl overflow-hidden border-2 border-emerald-200/80 bg-white/80 backdrop-blur-xl shadow-lg relative">
       {nodes.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-3">
-          <p className="text-sm font-semibold">No active group members found. Click "🌱 Seed" above! </p>
+          <p className="text-sm font-semibold">No active group members found. Invite your friends! </p>
         </div>
       ) : (
         <ReactFlow
           nodes={flowNodes}
           edges={flowEdges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={onNodeClick}
@@ -154,7 +162,7 @@ const NetworkGraph = ({
           maxZoom={1.8}
         >
           <Background color="#cbd5e1" gap={26} size={1} />
-          <Controls className="!bg-white/90 !border-slate-200 !text-slate-800 !rounded-2xl overflow-hidden shadow-md" />
+          <Controls showInteractive={false} className="!bg-white/90 !border-slate-200 !text-slate-800 !rounded-2xl overflow-hidden shadow-md" />
           <MiniMap
             nodeColor={(n) => {
               const bal = n.data?.net_balance || 0;
