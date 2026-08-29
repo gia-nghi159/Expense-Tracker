@@ -14,9 +14,9 @@ class FinGraphUser(HttpUser):
         }
         res = self.client.post("/api/v1/groups/quick-create", json=payload)
         if res.status_code == 201:
-            self.group = res.json()
-            self.group_id = self.group["id"]
-            self.members = self.group["members"]
+            self.trip_data = res.json()
+            self.group_id = self.trip_data["id"]
+            self.members = self.trip_data["members"]
         else:
             self.group_id = None
 
